@@ -76,7 +76,7 @@ void process_idle ( ofdm_params *ofdm, int word ) {
 }
 
 void process_symbol ( ofdm_params *ofdm, int word ) {
-    if ( ofdm->symbol_cnt < OFDM_SYM_LEN ) {
+    if ( ofdm->symbol_cnt == OFDM_SYM_LEN ) {
         ofdm->state = PREFIX;
         ofdm->symbol_cnt = 0;
         ofdm_demod ( ofdm );

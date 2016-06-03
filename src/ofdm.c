@@ -17,7 +17,8 @@ ofdm_params *ofdm_init () {
 
     forExport->fft_plan = fftw_plan_dft_1d ( OFDM_SYM_LEN , forExport->ofdm_in,\
          forExport->fft_out, FFTW_FORWARD, FFTW_ESTIMATE );
-
+    forExport->symbol_cnt = 0;
+    forExport->state = IDLE;
     return forExport;
 }
 
@@ -30,7 +31,7 @@ void ofdm_demod ( ofdm_params *params ) {
     for ( i = 1; i < OFDM_SYM_LEN; i += 2 ) {
         ofdm_compensate ( fft_out[i], fft_out[i - 1] );
         qpsk_decode ( &tmp_sample, fft_out[i] );
-        if ( (j++) % (SAMPLE_LEN / BITS_PER_MOD) == 0) {
+        if ( (++j) % (SAMPLE_LEN / BITS_PER_MOD) == 0) {
             out[k++] = tmp_sample;
             tmp_sample = 0;
         }

@@ -9,7 +9,7 @@ extern void (*ofdm_process_state[STATE_NUM])(ofdm_params *, int);
  */
 int main () {
     ofdm_params *p = ofdm_init();
-    //signal_state state = IDLE;
+    
     int word = 0;
 
     while ( 1367 ) {

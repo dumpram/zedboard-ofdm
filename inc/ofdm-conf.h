@@ -12,6 +12,8 @@
 
 #define SAMPLE_LEN 16
 
+#define SAMPLE_NUM_PER_SYM ((OFDM_SYM_LEN) * (BITS_PER_MOD) / (2 * (SAMPLE_LEN)))
+
 #define REF_PILOT_REAL ((double) 0.2)
 #define REF_PILOT_IMAG ((double) 0.0)
 

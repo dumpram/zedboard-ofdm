@@ -15,23 +15,18 @@ extern void (*ofdm_process_state[STATE_NUM])(ofdm_params *, int);
  * @return 0 on success, -1 otherwise
  */
 int main () {
-    ofdm_params *p = ofdm_init();
-    int audio_fd = open ( XILLY_AUDIO, O_RDONLY );
-    int out_fd = open ( DEMOD_OUT, O_WRONLY );
+    int audio_fd = open ( XILLY_AUDIO, O_RDWR );
+    int out_fd = open ( DEMOD_OUT, O_WRONLY | O_CREAT | O_TRUNC );
 
     int word = 0;
+    short half = 0;
+    ofdm_params *p = ofdm_init( out_fd );
 
     perror ( "OFDM receiver start...\r\n" );
 
     while ( 1367 ) {
         word = read_word ( audio_fd );
-
-        ofdm_process_state[p->state](p, word);
-        //if ( p->fft_acq ) {
-        //    // if fft done, write to output
-        //}
-
-        write_word ( out_fd, word );
+        ofdm_process_state[p->state]( p, word );
     }
 
     return 0;

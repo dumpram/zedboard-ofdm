@@ -22,13 +22,14 @@ struct ofdm_params {
     fftw_complex ofdm_in[OFDM_SYM_LEN];
     fftw_complex fft_out[OFDM_SYM_LEN];
     fftw_plan fft_plan;
-    short ofdm_out[OFDM_SYM_LEN * BITS_PER_MOD / SAMPLE_LEN];
+    short ofdm_out[SAMPLE_NUM_PER_SYM];
     ofdm_state state;
     int symbol_cnt;
+    int fd_out;
 };
 
 
-ofdm_params *ofdm_init ();
+ofdm_params *ofdm_init ( int out_fd );
 void ofdm_demod ( ofdm_params *ofdm );
 void ofdm_compensate ( fftw_complex target, fftw_complex ref );
 void qpsk_decode ( short *sample, fftw_complex carrier );

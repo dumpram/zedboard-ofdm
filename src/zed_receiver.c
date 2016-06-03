@@ -5,7 +5,7 @@
 #include "io.h"
 
 
-#define XILLY_AUDIO "temp.wav"
+#define XILLY_AUDIO "/dev/xillybus_audio"
 #define DEMOD_OUT "out.wav"
 
 extern void (*ofdm_process_state[STATE_NUM])(ofdm_params *, int);
@@ -21,12 +21,13 @@ int main () {
 
     int word = 0;
 
+    perror ( "OFDM receiver start...\r\n" );
+
     while ( 1367 ) {
         word = read_word ( audio_fd );
 
         ofdm_process_state[p->state](p, word);
-
-        //if ( p-> fft_acq ) {
+        //if ( p->fft_acq ) {
         //    // if fft done, write to output
         //}
 

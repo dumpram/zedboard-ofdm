@@ -69,6 +69,7 @@ void ofdm_dump ( ofdm_params *ofdm ) {
 }
 
 void process_idle ( ofdm_params *ofdm, int word ) {
+    perror ("State idle...");
     if ( word > SIG_THR ) {
         ofdm->state = SYMBOL;
         process_symbol ( ofdm, word );

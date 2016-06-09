@@ -26,6 +26,8 @@ struct ofdm_params {
     ofdm_state state;
     int symbol_cnt;
     int fd_out;
+    int fft_fd_in;
+    int fft_fd_out;
 };
 
 

@@ -7,6 +7,28 @@
 
 static fftw_complex reference = { REF_PILOT_REAL, REF_PILOT_IMAG };
 
+void _fftw_execute ( ofdm_params *params ) {
+
+#ifdef HW_SOLUTION
+    int i, word;
+    for ( i = 0; i < OFDM_SYM_LEN; i++ ) {
+        write_half (params->fft_fd_in, (short) ((params->ofdm_in[i][REAL]) * pow(2, SAMPLE_LEN)));
+        write_half (params->fft_fd_in, (short) ((params->ofdm_in[i][IMAG]) * pow(2, SAMPLE_LEN)));
+    }
+
+    for ( i = 0; i < OFDM_SYM_LEN; i++ ) {
+        read_word (params->fft_fd_out, &word);
+        params->fft_out[i][REAL] =
+            (double)((short)(word >> SAMPLE_LEN)) / pow ( 2, SAMPLE_LEN );
+        params->fft_out[i][IMAG] =
+            (double)((short)(word & 0xFFFF)) / pow ( 2, SAMPLE_LEN );
+    }
+#else
+    fftw_execute ( params->fft_plan );
+#endif
+
+}
+
 void (*ofdm_process_state[STATE_NUM])( ofdm_params*, int ) = {
     process_idle,
     process_symbol,
@@ -37,7 +59,7 @@ void ofdm_demod ( ofdm_params *params ) {
     fftw_complex *fft_out = params->fft_out;
     short *out = params->ofdm_out;
     short tmp_sample = 0;
-    fftw_execute ( params->fft_plan );
+    _fftw_execute ( params );
     for ( i = 1; i < OFDM_SYM_LEN; i += 2 ) {
         ofdm_compensate ( fft_out[i], fft_out[i - 1] );
         qpsk_decode ( &tmp_sample, fft_out[i] );

@@ -19,7 +19,7 @@
 
 #define SIG_THR ((int)(1 << 21)) // very lucky i must be
 
-//#define HW_SOLUTION // uncomment for hardware solution
+#define HW_SOLUTION // uncomment for hardware solution
 
 
 #endif /* end of include guard: _OFDM_CONF_H_ */

@@ -7,8 +7,8 @@
 
 #define XILLY_AUDIO "/dev/xillybus_audio"
 #define DEMOD_OUT "out.wav"
-#define FFT_FD_IN "/dev/xillybus_wr"
-#define FFT_FD_OUT "/dev/xillybus_r"
+#define FFT_FD_IN "/dev/xillybus_write_32"
+#define FFT_FD_OUT "/dev/xillybus_read_32"
 
 extern void (*ofdm_process_state[STATE_NUM])(ofdm_params *, int);
 

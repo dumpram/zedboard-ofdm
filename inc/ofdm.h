@@ -23,6 +23,7 @@ struct ofdm_params {
     fftw_complex fft_out[OFDM_SYM_LEN];
     fftw_plan fft_plan;
     short ofdm_out[SAMPLE_NUM_PER_SYM];
+    int raw_word[OFDM_SYM_LEN];
     ofdm_state state;
     int symbol_cnt;
     int fd_out;

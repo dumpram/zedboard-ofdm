@@ -12,12 +12,11 @@ void _fftw_execute ( ofdm_params *params ) {
 #ifdef HW_SOLUTION
     int i, word;
     for ( i = 0; i < OFDM_SYM_LEN; i++ ) {
-        write_half (params->fft_fd_in, (short) ((params->ofdm_in[i][REAL]) * pow(2, SAMPLE_LEN)));
-        write_half (params->fft_fd_in, (short) ((params->ofdm_in[i][IMAG]) * pow(2, SAMPLE_LEN)));
+        write_word (params->fft_fd_in, params->raw_word[i]);
     }
 
     for ( i = 0; i < OFDM_SYM_LEN; i++ ) {
-        read_word (params->fft_fd_out, &word);
+        word = read_word (params->fft_fd_out);
         params->fft_out[i][REAL] =
             (double)((short)(word >> SAMPLE_LEN)) / pow ( 2, SAMPLE_LEN );
         params->fft_out[i][IMAG] =
@@ -76,7 +75,7 @@ void ofdm_demod ( ofdm_params *params ) {
 
     }
     //printf ( "k: %d", k );
-//    dump_samples(params);
+    dump_samples(params);
 }
 
 
@@ -105,7 +104,7 @@ void qpsk_decode ( short *sample, fftw_complex carrier ) {
 }
 
 void ofdm_dump ( ofdm_params *ofdm ) {
-    int i, word;
+    int i;
     for ( i = 0; i < SAMPLE_NUM_PER_SYM; i++ ) {
         write_half ( ofdm->fd_out, ofdm->ofdm_out[i] ); // Left
         write_half ( ofdm->fd_out, ofdm->ofdm_out[i] ); // Right
@@ -130,6 +129,7 @@ void process_symbol ( ofdm_params *ofdm, int word ) {
         ofdm_dump ( ofdm );
         process_prefix ( ofdm, word );
     } else {
+        ofdm->raw_word[ofdm->symbol_cnt] = word;
         ofdm->ofdm_in[ofdm->symbol_cnt][REAL] =
             (double)((short)(word >> SAMPLE_LEN)) / pow ( 2, SAMPLE_LEN );
         ofdm->ofdm_in[ofdm->symbol_cnt][IMAG] =

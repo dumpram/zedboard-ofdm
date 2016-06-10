@@ -14,7 +14,7 @@ int read_word ( int fd ) {
 
 short read_half ( int fd ) {
     int i;
-    short forExport;
+    short forExport = 0;
     char temp;
     for ( i = 0; i < HALF_LEN; i++ ) {
         read ( fd, &temp, sizeof(char) );
@@ -32,11 +32,11 @@ void write_word ( int fd, int word ) {
     }
 }
 
-void write_half ( int fd, short word ) {
+void write_half ( int fd, short half ) {
     int i;
     char temp;
     for ( i = 0; i < HALF_LEN; i++ ) {
-        temp = (word >> (i * 8)) & 0xFF;
+        temp = (half >> (i * 8)) & 0xFF;
         write ( fd, &temp, sizeof(char) );
     }
 }

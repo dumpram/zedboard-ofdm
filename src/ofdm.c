@@ -17,7 +17,7 @@ ofdm_params *ofdm_init ( int out_fd ) {
     ofdm_params *forExport = (ofdm_params *) malloc ( sizeof(ofdm_params) );
 
     forExport->fft_plan = fftw_plan_dft_1d ( OFDM_SYM_LEN , forExport->ofdm_in,\
-         forExport->fft_out, FFTW_FORWARD, FFTW_ESTIMATE );
+         forExport->fft_out, FFTW_FORWARD, FFTW_EXHAUSTIVE );
     forExport->symbol_cnt = 0;
     forExport->state = IDLE;
     forExport->fd_out = out_fd;
@@ -87,8 +87,8 @@ void ofdm_dump ( ofdm_params *ofdm ) {
     for ( i = 0; i < SAMPLE_NUM_PER_SYM; i++ ) {
         write_half ( ofdm->fd_out, ofdm->ofdm_out[i] ); // Left
         write_half ( ofdm->fd_out, ofdm->ofdm_out[i] ); // Right
-        write_half ( ofdm->fd_out, ofdm->ofdm_out[i] ); // Comp Left
-        write_half ( ofdm->fd_out, ofdm->ofdm_out[i] ); // Comp Right
+//        write_half ( ofdm->fd_out, ofdm->ofdm_out[i] ); // Comp Left
+//        write_half ( ofdm->fd_out, ofdm->ofdm_out[i] ); // Comp Right
     }
 }
 

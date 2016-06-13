@@ -17,7 +17,7 @@ ofdm_params *ofdm_init ( int out_fd ) {
     ofdm_params *forExport = (ofdm_params *) malloc ( sizeof(ofdm_params) );
 
     forExport->fft_plan = fftw_plan_dft_1d ( OFDM_SYM_LEN , forExport->ofdm_in,\
-         forExport->fft_out, FFTW_FORWARD, FFTW_EXHAUSTIVE );
+         forExport->fft_out, FFTW_FORWARD, FFTW_ESTIMATE );
     forExport->symbol_cnt = 0;
     forExport->state = IDLE;
     forExport->fd_out = out_fd;
@@ -27,7 +27,7 @@ ofdm_params *ofdm_init ( int out_fd ) {
 void dump_samples (ofdm_params *ofdm) {
     int i;
     for ( i = 0; i < (SAMPLE_NUM_PER_SYM); i++ ) {
-        printf ("%d\n", ofdm->ofdm_out[i] );
+        printf ("%lf %lf\n", ofdm->fft_out[i][REAL], ofdm->fft_out[i][IMAG] );
     }
     exit(1);
 }
@@ -38,6 +38,7 @@ void ofdm_demod ( ofdm_params *params ) {
     short *out = params->ofdm_out;
     short tmp_sample = 0;
     fftw_execute ( params->fft_plan );
+
     for ( i = 1; i < OFDM_SYM_LEN; i += 2 ) {
         ofdm_compensate ( fft_out[i], fft_out[i - 1] );
         qpsk_decode ( &tmp_sample, fft_out[i] );
@@ -54,7 +55,7 @@ void ofdm_demod ( ofdm_params *params ) {
 
     }
     //printf ( "k: %d", k );
-//    dump_samples(params);
+    dump_samples(params);
 }
 
 

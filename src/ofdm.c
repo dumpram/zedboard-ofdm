@@ -57,7 +57,8 @@ ofdm_params *ofdm_init ( int out_fd ) {
     cyclic_prefix_mean = SIG_THR;
     forExport->state = IDLE;
     forExport->fd_out = out_fd;
-
+    FILE *csv = fopen ( "qpsk.csv", "w" );
+    fclose (csv);
     init_quadrant_reference();
 
     return forExport;
@@ -65,10 +66,11 @@ ofdm_params *ofdm_init ( int out_fd ) {
 
 void dump_samples (ofdm_params *ofdm) {
     int i;
+    FILE *csv = fopen ( "qpsk.csv", "a" );
     for ( i = 0; i < (SAMPLE_NUM_PER_SYM); i++ ) {
-        //printf ("%d\n", ofdm->ofdm_out[i] );
-        printf ("%lf %lf\n", ofdm->fft_out[i][REAL], ofdm->fft_out[i][IMAG] );
+        fprintf (csv, "%lf %lf\n", ofdm->fft_out[i][REAL], ofdm->fft_out[i][IMAG] );
     }
+    fclose (csv);
     exit(1);
 }
 
@@ -172,7 +174,7 @@ void process_symbol ( ofdm_params *ofdm, int word ) {
         process_prefix ( ofdm, word );
     } else {
         ofdm->raw_word[ofdm->symbol_cnt] = word;
-        comp = ((ofdm->symbol_cnt % 2) == 0) ? 1 : -1; 
+        comp = ((ofdm->symbol_cnt % 2) == 0) ? 1 : -1;
         ofdm->ofdm_in[ofdm->symbol_cnt][REAL] = comp *
             (double)((short)(word >> SAMPLE_LEN)) / pow ( 2, SAMPLE_LEN-1 );
         ofdm->ofdm_in[ofdm->symbol_cnt][IMAG] = comp *

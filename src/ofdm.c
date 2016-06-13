@@ -71,7 +71,6 @@ void dump_samples (ofdm_params *ofdm) {
         fprintf (csv, "%lf %lf\n", ofdm->fft_out[i][REAL], ofdm->fft_out[i][IMAG] );
     }
     fclose (csv);
-    exit(1);
 }
 
 void ofdm_demod ( ofdm_params *params ) {

@@ -19,14 +19,18 @@ extern void (*ofdm_process_state[STATE_NUM])(ofdm_params *, int);
 int main () {
     int audio_fd = open ( XILLY_AUDIO, O_RDWR );
     int out_fd = open ( DEMOD_OUT, O_WRONLY | O_CREAT | O_TRUNC );
-    int fft_in_fd = open ( FFT_FD_IN, O_WRONLY );
-    int fft_out_fd = open ( FFT_FD_OUT, O_RDONLY );
+    #ifdef HW_SOLUTION
+	int fft_in_fd = open ( FFT_FD_IN, O_WRONLY );
+        int fft_out_fd = open ( FFT_FD_OUT, O_RDONLY );
+    #endif
 
     int word = 0;
     short half = 0;
     ofdm_params *p = ofdm_init( out_fd );
-    p->fft_fd_in = fft_in_fd;
-    p->fft_fd_out = fft_out_fd;
+    #ifdef HW_SOLUTION
+        p->fft_fd_in = fft_in_fd;
+        p->fft_fd_out = fft_out_fd;
+    #endif
 
     perror ( "OFDM receiver start...\r\n" );
 

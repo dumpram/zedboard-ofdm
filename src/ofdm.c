@@ -149,10 +149,10 @@ void process_symbol ( ofdm_params *ofdm, int word ) {
 }
 
 void process_prefix ( ofdm_params *ofdm, int word ) {
-    if ( ofdm->symbol_cnt == OFDM_CYC_LEN ) {
-        ofdm->state = SYMBOL;
+    if ( ofdm->symbol_cnt == OFDM_CYC_LEN-50 ) {
+        ofdm->state = IDLE;
         ofdm->symbol_cnt = 0;
-        process_symbol ( ofdm, word );
+	process_idle ( ofdm, word );
     } else {
         ofdm->symbol_cnt++;
     }

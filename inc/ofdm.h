@@ -32,7 +32,7 @@ struct ofdm_params {
 ofdm_params *ofdm_init ( int out_fd );
 void ofdm_demod ( ofdm_params *ofdm );
 void ofdm_compensate ( fftw_complex target, fftw_complex ref );
-void qpsk_decode ( short *sample, fftw_complex carrier );
+int qpsk_decode ( short *sample, fftw_complex carrier );
 void ofdm_dump ( ofdm_params *ofdm );
 
 void process_idle ( ofdm_params *ofdm, int word );

@@ -4,8 +4,20 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <math.h>
 
 static fftw_complex reference = { REF_PILOT_REAL, REF_PILOT_IMAG };
+
+static fftw_complex ref_carrier[4];
+void init_quadrant_reference(){
+    ref_carrier[0][REAL] = 1/sqrt(2); ref_carrier[0][IMAG] = 1/sqrt(2);
+    ref_carrier[1][REAL] = 1/sqrt(2); ref_carrier[1][IMAG] = -1/sqrt(2);
+    ref_carrier[2][REAL] = -1/sqrt(2); ref_carrier[2][IMAG] = 1/sqrt(2);
+    ref_carrier[3][REAL] = -1/sqrt(2); ref_carrier[3][IMAG] = -1/sqrt(2);
+}
+
+static int evm_cnt = 0;
+static double evm_rrr = 0;
 
 void (*ofdm_process_state[STATE_NUM])( ofdm_params*, int ) = {
     process_idle,
@@ -21,6 +33,7 @@ ofdm_params *ofdm_init ( int out_fd ) {
     forExport->symbol_cnt = 0;
     forExport->state = IDLE;
     forExport->fd_out = out_fd;
+    init_quadrant_reference();
     return forExport;
 }
 
@@ -37,11 +50,15 @@ void ofdm_demod ( ofdm_params *params ) {
     fftw_complex *fft_out = params->fft_out;
     short *out = params->ofdm_out;
     short tmp_sample = 0;
+    double evm = 0;
+    int ref_index;
     fftw_execute ( params->fft_plan );
 
     for ( i = 1; i < OFDM_SYM_LEN; i += 2 ) {
         ofdm_compensate ( fft_out[i], fft_out[i - 1] );
-        qpsk_decode ( &tmp_sample, fft_out[i] );
+        ref_index = qpsk_decode ( &tmp_sample, fft_out[i] );
+        evm += pow((fft_out[i][REAL] - ref_carrier[ref_index][REAL]), 2)
+                    + pow((fft_out[i][IMAG] - ref_carrier[ref_index][IMAG]), 2);
         if ( j == (SAMPLE_LEN / BITS_PER_MOD - 1) ) {
             j = 0;
             out[k] = tmp_sample;
@@ -52,10 +69,20 @@ void ofdm_demod ( ofdm_params *params ) {
         } else {
             j++;
         }
-
     }
+    evm = sqrt ( evm/(OFDM_SYM_LEN / 2) );
+    evm_rrr = (evm_rrr + evm) / 2;
+    evm_cnt++;
+    evm_cnt %= 100;
+
+    if ( evm_cnt == 0 ) {
+        printf (">> EVM value [DEBUG // SYS]: %lf\r\n", evm_rrr);
+        evm_rrr = 0;
+    }
+
+
     //printf ( "k: %d", k );
-    dump_samples(params);
+    //dump_samples(params);
 }
 
 
@@ -66,19 +93,23 @@ void ofdm_compensate ( fftw_complex target, fftw_complex ref ) {
     cmplx_mul ( target, temp, target );
 }
 
-void qpsk_decode ( short *sample, fftw_complex carrier ) {
+int qpsk_decode ( short *sample, fftw_complex carrier ) {
     (*sample) <<= 2;
     if ( carrier[REAL] > 0 ) {
         if ( carrier[IMAG] > 0) {
             (*sample) |= 0;
+            return 0;
         } else {
             (*sample) |= 1;
+            return 1;
         }
     } else {
         if ( carrier[IMAG] > 0) {
             (*sample) |= 2;
+            return 2;
         } else {
             (*sample) |= 3;
+            return 3;
         }
     }
 }

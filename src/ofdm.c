@@ -131,13 +131,15 @@ void process_idle ( ofdm_params *ofdm, int word ) {
     //if ( word > SIG_THR * 2 ) {
     if ( word > 10*cyclic_prefix_mean ) {
         ofdm->state = SYMBOL;
-        perror ("Symbol detected...");
 	cyclic_prefix_mean = 0;
         process_symbol ( ofdm, word );
     }
 }
 
 void process_symbol ( ofdm_params *ofdm, int word ) {
+    // Simulating fftshift with comp variable
+    double comp;
+
     if ( ofdm->symbol_cnt == OFDM_SYM_LEN ) {
         ofdm->state = PREFIX;
         ofdm->symbol_cnt = 0;
@@ -145,10 +147,11 @@ void process_symbol ( ofdm_params *ofdm, int word ) {
         ofdm_dump ( ofdm );
         process_prefix ( ofdm, word );
     } else {
-        ofdm->ofdm_in[ofdm->symbol_cnt][REAL] =
-            (double)((short)(word >> SAMPLE_LEN)) / pow ( 2, SAMPLE_LEN );
-        ofdm->ofdm_in[ofdm->symbol_cnt][IMAG] =
-            (double)((short)(word & 0xFFFF)) / pow ( 2, SAMPLE_LEN );
+        comp = ((symbol_cnt % 2) == 0) ? 1 : -1; 
+        ofdm->ofdm_in[ofdm->symbol_cnt][REAL] = comp *
+            (double)((short)(word >> SAMPLE_LEN)) / pow ( 2, SAMPLE_LEN-1 );
+        ofdm->ofdm_in[ofdm->symbol_cnt][IMAG] = comp *
+            (double)((short)(word & 0xFFFF)) / pow ( 2, SAMPLE_LEN-1 );
         ofdm->symbol_cnt++;
     }
 }

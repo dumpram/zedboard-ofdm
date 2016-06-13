@@ -147,7 +147,7 @@ void process_symbol ( ofdm_params *ofdm, int word ) {
         ofdm_dump ( ofdm );
         process_prefix ( ofdm, word );
     } else {
-        comp = ((symbol_cnt % 2) == 0) ? 1 : -1; 
+        comp = ((ofdm->symbol_cnt % 2) == 0) ? 1 : -1; 
         ofdm->ofdm_in[ofdm->symbol_cnt][REAL] = comp *
             (double)((short)(word >> SAMPLE_LEN)) / pow ( 2, SAMPLE_LEN-1 );
         ofdm->ofdm_in[ofdm->symbol_cnt][IMAG] = comp *

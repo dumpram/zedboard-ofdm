@@ -110,11 +110,9 @@ void ofdm_demod ( ofdm_params *params ) {
     if ( evm_cnt == 0 ) {
         printf (">> EVM value [DEBUG // SYS]: %lf\r\n", evm_rrr);
         evm_rrr = 0;
+	dump_samples(params);
     }
 
-
-    //printf ( "k: %d", k );
-    //dump_samples(params);
 }
 
 void ofdm_compensate ( fftw_complex target, fftw_complex ref ) {

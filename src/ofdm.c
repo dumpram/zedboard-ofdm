@@ -19,6 +19,8 @@ void init_quadrant_reference(){
 static int evm_cnt = 0;
 static double evm_rrr = 0;
 
+static double cyclic_prefix_mean;
+
 void (*ofdm_process_state[STATE_NUM])( ofdm_params*, int ) = {
     process_idle,
     process_symbol,
@@ -31,6 +33,7 @@ ofdm_params *ofdm_init ( int out_fd ) {
     forExport->fft_plan = fftw_plan_dft_1d ( OFDM_SYM_LEN , forExport->ofdm_in,\
          forExport->fft_out, FFTW_FORWARD, FFTW_ESTIMATE );
     forExport->symbol_cnt = 0;
+    cyclic_prefix_mean = SIG_THR;
     forExport->state = IDLE;
     forExport->fd_out = out_fd;
     init_quadrant_reference();
@@ -125,9 +128,11 @@ void ofdm_dump ( ofdm_params *ofdm ) {
 }
 
 void process_idle ( ofdm_params *ofdm, int word ) {
-    if ( word > SIG_THR * 2 ) {
+    //if ( word > SIG_THR * 2 ) {
+    if ( word > 10*cyclic_prefix_mean ) {
         ofdm->state = SYMBOL;
         perror ("Symbol detected...");
+	cyclic_prefix_mean = 0;
         process_symbol ( ofdm, word );
     }
 }
@@ -152,8 +157,10 @@ void process_prefix ( ofdm_params *ofdm, int word ) {
     if ( ofdm->symbol_cnt == OFDM_CYC_LEN-50 ) {
         ofdm->state = IDLE;
         ofdm->symbol_cnt = 0;
+	cyclic_prefix_mean /= (OFDM_CYC_LEN-50);
 	process_idle ( ofdm, word );
     } else {
+        cyclic_prefix_mean += word;
         ofdm->symbol_cnt++;
     }
 }

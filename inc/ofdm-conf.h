@@ -17,7 +17,10 @@
 #define REF_PILOT_REAL ((double) 0.2)
 #define REF_PILOT_IMAG ((double) 0.0)
 
-#define SIG_THR ((int)(1 << 21)) // very lucky i must be
+#define SIG_THR ((int)(1 << 19)) // very lucky i must be
+#define AMP_THR ((int) 10)
+
+#define PREFIX_JITTER 10
 
 // #define HW_SOLUTION // uncomment for hardware solution
 

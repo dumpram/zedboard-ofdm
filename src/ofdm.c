@@ -152,7 +152,7 @@ void ofdm_dump ( ofdm_params *ofdm ) {
 }
 
 void process_idle ( ofdm_params *ofdm, int word ) {
-    if ( word > 10*cyclic_prefix_mean ) {
+    if ( word > AMP_THR * cyclic_prefix_mean ) {
         ofdm->state = SYMBOL;
 	cyclic_prefix_mean = 0;
         process_symbol ( ofdm, word );
@@ -181,10 +181,10 @@ void process_symbol ( ofdm_params *ofdm, int word ) {
 }
 
 void process_prefix ( ofdm_params *ofdm, int word ) {
-    if ( ofdm->symbol_cnt == OFDM_CYC_LEN-50 ) {
+    if ( ofdm->symbol_cnt == OFDM_CYC_LEN - PREFIX_JITTER ) {
         ofdm->state = IDLE;
         ofdm->symbol_cnt = 0;
-	cyclic_prefix_mean /= (OFDM_CYC_LEN-50);
+	cyclic_prefix_mean /= ( OFDM_CYC_LEN - PREFIX_JITTER );
 	process_idle ( ofdm, word );
     } else {
         cyclic_prefix_mean += word;
